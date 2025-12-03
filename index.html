@@ -12,55 +12,24 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
-    <!-- Babel (для JSX) -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Framer Motion -->
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     
     <style>
-        /* МАСШТАБИРОВАНИЕ И БАЗОВЫЕ СТИЛИ */
-        html {
-            font-size: 14px; /* Компактный вид на ПК */
-            height: 100%;
-        }
-        
-        @media (max-width: 768px) {
-            html {
-                font-size: 12px; /* Компактный вид на телефонах */
-            }
-        }
-
-        body {
-            background-color: #050505;
-            color: #e2e8f0;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            height: 100%;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        #root {
-            min-height: 100vh;
-        }
-
-        /* Скроллбар */
+        html { font-size: 14px; height: 100%; }
+        @media (max-width: 768px) { html { font-size: 12px; } }
+        body { background-color: #050505; color: #e2e8f0; margin: 0; overflow-x: hidden; height: 100%; font-family: 'Segoe UI', Roboto, sans-serif; }
+        #root { min-height: 100vh; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
-
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: { 850: '#152035', 900: '#0f172a', 950: '#020617' }
-                    }
-                }
-            }
+            theme: { extend: { colors: { slate: { 850: '#152035', 900: '#0f172a', 950: '#020617' } } } }
         }
     </script>
 </head>
@@ -68,52 +37,46 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // --- БЕЗОПАСНЫЙ ИМПОРТ ЗАВИСИМОСТЕЙ ---
         const { useState, useEffect, useMemo } = React;
-        // Проверка наличия Framer Motion, чтобы не было краша
         const MotionLib = window.Motion || window.framerMotion;
-        const { motion, AnimatePresence } = MotionLib || { 
-            motion: { div: 'div', h1: 'h1', button: 'button', span: 'span', nav: 'nav' }, 
-            AnimatePresence: ({children}) => <>{children}</> 
+        const { motion, AnimatePresence } = MotionLib || { motion: { div: 'div' }, AnimatePresence: ({children}) => <>{children}</> };
+
+        // --- ССЫЛКИ ДЛЯ ОПЛАТЫ (РЕДАКТИРОВАТЬ ТУТ) ---
+        const LINKS = {
+            // Ссылка, которую ты дал для CryptoCloud
+            CRYPTO: "https://pay.cryptocloud.plus/pos/Xz20fKJCDOaOpjUn?roistat_visit=712328",
+            
+            // Сюда вставь ссылку для карт (FreeKassa, Enot, Unitpay или другая)
+            FIAT: "https://google.com" 
         };
 
-        /* --- ВСТРОЕННЫЕ ИКОНКИ (SVG) --- 
-           Встроены прямо сюда, чтобы не зависеть от внешних скриптов, которые ломают сайт.
-        */
         const Icons = {
-            Home: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-            Server: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>,
-            ShoppingCart: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>,
-            Image: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>,
-            Zap: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-            Star: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-            Crown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>,
-            Shield: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-            Ghost: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>,
-            Flame: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
-            Box: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
-            Package: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m16.5 9.4-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
-            Gift: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>,
-            MessageCircle: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
-            Gamepad2: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>,
-            Unlock: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
-            Mic: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>,
-            ChevronRight: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>,
-            X: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-            Check: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+            Home: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+            Server: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>,
+            ShoppingCart: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>,
+            Image: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>,
+            X: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            Check: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+            ChevronRight: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>,
+            // Новые иконки для оплаты
+            CreditCard: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>,
+            Bitcoin: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.279 5.307m2.145-1.172L9.963 2.165m2.592 11.233-.35 1.992"/></svg>,
+            Zap: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            Star: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+            Crown: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>,
+            Shield: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+            Ghost: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>,
+            Flame: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>,
+            Box: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+            Package: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m16.5 9.4-9-5.19"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+            Gift: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>,
+            MessageCircle: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
+            Gamepad2: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></svg>,
+            Unlock: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
+            Mic: (p) => <svg {...p} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>,
         };
 
-        /* --- ДАННЫЕ --- */
-
-        const PROMO_CODES = {
-            'WINTER2025': 0.15, 'DRAGON': 0.10, 'START': 0.05
-        };
-
-        const SOCIAL_LINKS = {
-            telegram: "https://t.me/example",
-            discord: "https://discord.gg/example"
-        };
-
+        const PROMO_CODES = { 'WINTER2025': 0.15, 'DRAGON': 0.10, 'START': 0.05 };
         const RANK_PRODUCTS = [
             { id: 'tiger', name: 'TIGER', price: 239, type: 'rank', icon: Icons.Zap, color: 'from-orange-400 to-amber-500', desc: 'Улучшенные киты, x3 валюты.' },
             { id: 'bunny', name: 'BUNNY', price: 369, type: 'rank', icon: Icons.Star, color: 'from-cyan-400 to-blue-400', desc: 'Доступ к региону, x3.5 монет.' },
@@ -125,7 +88,6 @@
             { id: 'moder', name: 'MODER', price: 1299, type: 'rank', icon: Icons.Shield, color: 'from-sky-400 to-blue-600', desc: 'Права модератора. Бан/Мут/Кик.' },
             { id: 'dadmin', name: 'D.ADMIN', price: 3650, type: 'rank', icon: Icons.Crown, color: 'from-red-500 to-red-700', desc: 'ВЛАДЕЛЕЦ. Максимальные права.' },
         ];
-
         const CASE_PRODUCTS = [
             { id: 'c_super_new', name: 'Супер кейс', price: 349, type: 'case', icon: Icons.Gift, color: 'from-fuchsia-600 to-pink-500', desc: 'Новинка! Эксклюзивные награды' },
             { id: 'c_purple', name: 'Кейс с супер донатом', price: 250, type: 'case', icon: Icons.Zap, color: 'from-purple-600 to-purple-400', desc: 'Шанс на высшие привилегии' },
@@ -137,484 +99,144 @@
             { id: 'c_yellow', name: 'Кейс с валютой', price: 49, type: 'case', icon: Icons.Crown, color: 'from-yellow-300 to-yellow-500', desc: 'Монеты и токены' },
             { id: 'c_cyan', name: 'Кейс с префиксами', price: 30, type: 'case', icon: Icons.MessageCircle, color: 'from-cyan-500 to-blue-400', desc: 'Уникальные цвета чата' },
         ];
-
         const MISC_PRODUCTS = [
             { id: 'unban', name: 'РАЗБАН', price: 349, type: 'misc', icon: Icons.Unlock, color: 'from-emerald-400 to-green-600', desc: 'Снимает блокировку аккаунта навсегда.' },
             { id: 'unmute', name: 'РАЗМУТ', price: 149, type: 'misc', icon: Icons.Mic, color: 'from-sky-400 to-blue-600', desc: 'Возвращает возможность писать в чат.' },
         ];
 
-        /* --- КОМПОНЕНТЫ --- */
-
-        const CssStarBackground = () => {
-            const shadows = useMemo(() => {
-                const generateShadows = (n) => {
-                    let value = '';
-                    for (let i = 0; i < n; i++) {
-                        value += `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF, `;
-                    }
-                    return value.slice(0, -2);
-                };
-                return {
-                    small: generateShadows(700),
-                    medium: generateShadows(200),
-                    large: generateShadows(100)
-                };
-            }, []);
-
-            return (
-                <div className="fixed inset-0 overflow-hidden pointer-events-none -z-50 bg-black">
-                    <style>{`
-                        @keyframes animStar { from { transform: translateY(0px); } to { transform: translateY(-2000px); } }
-                        @keyframes twinkle { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-                    `}</style>
-                    <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-black/80"></div>
-                    <div style={{ width: 1, height: 1, boxShadow: shadows.small, animation: 'animStar 100s linear infinite, twinkle 3s ease-in-out infinite' }} className="absolute bg-transparent rounded-full"></div>
-                    <div style={{ width: 2, height: 2, boxShadow: shadows.medium, animation: 'animStar 150s linear infinite, twinkle 5s ease-in-out infinite' }} className="absolute bg-transparent rounded-full"></div>
-                    <div style={{ width: 3, height: 3, boxShadow: shadows.large, animation: 'animStar 200s linear infinite, twinkle 7s ease-in-out infinite' }} className="absolute bg-transparent rounded-full"></div>
-                </div>
-            );
-        };
-
-        const Navbar = ({ activeTab, setActiveTab }) => {
-            const tabs = [
-                { id: 'home', icon: Icons.Home, label: 'Главная' },
-                { id: 'server', icon: Icons.Server, label: 'Сервер' },
-                { id: 'shop', icon: Icons.ShoppingCart, label: 'Магазин' },
-                { id: 'gallery', icon: Icons.Image, label: 'Медиа' },
-            ];
-
-            return (
-                <nav className="fixed top-0 left-0 right-0 z-40 flex flex-col md:flex-row items-center justify-center py-4 md:py-6 gap-2 md:gap-4 pointer-events-none">
-                    <div className="flex bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-full px-2 py-2 shadow-[0_0_30px_rgba(0,100,255,0.2)] pointer-events-auto scale-90 md:scale-100">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`relative flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full transition-all duration-300 ${
-                                    activeTab === tab.id 
-                                        ? 'text-white' 
-                                        : 'text-slate-400 hover:text-blue-200'
-                                }`}
-                            >
-                                {activeTab === tab.id && (
-                                    <motion.div
-                                        layoutId="active-pill"
-                                        className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-full"
-                                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                    />
-                                )}
-                                <span className="relative z-10 flex items-center gap-2 font-medium text-sm md:text-base">
-                                    <tab.icon size={16} />
-                                    {tab.label}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                    
-                    <div className="flex gap-2 pointer-events-auto scale-90 md:scale-100">
-                        <a href={SOCIAL_LINKS.telegram} target="_blank" rel="noreferrer" className="group p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-blue-500/20">
-                            <Icons.MessageCircle size={18} className="group-hover:rotate-12 transition-transform" />
-                        </a>
-                        <a href={SOCIAL_LINKS.discord} target="_blank" rel="noreferrer" className="group p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-indigo-600/20">
-                            <Icons.Gamepad2 size={18} className="group-hover:rotate-12 transition-transform" />
-                        </a>
-                    </div>
-                </nav>
-            );
-        };
-
-        const HeroSection = ({ setActiveTab }) => (
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center justify-center min-h-screen text-center px-4 pt-20"
-            >
-                <motion.h1 
-                    className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 via-blue-500 to-purple-700 drop-shadow-[0_0_30px_rgba(0,100,255,0.6)] mb-6 uppercase select-none leading-tight"
-                    animate={{ textShadow: ["0 0 20px #0ea5e9", "0 0 50px #3b82f6", "0 0 20px #0ea5e9"] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                >
-                    DRAGON<br/>WORLD
-                </motion.h1>
-                <p className="text-lg md:text-xl text-blue-100/80 max-w-xl mb-10 font-light tracking-wide">
-                    Легендарный сервер с уникальными режимами. Стань частью драконьего мира.
-                </p>
-                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto px-4">
-                    <button 
-                        onClick={() => setActiveTab('shop')}
-                        className="group relative px-8 py-3 md:px-10 md:py-4 font-bold rounded-2xl overflow-hidden transition-all hover:scale-105 shadow-[0_0_20px_rgba(37,99,235,0.4)] w-full md:w-auto"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600" />
-                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <span className="relative z-10 flex items-center justify-center gap-2 text-white">
-                            КУПИТЬ ДОНАТ <Icons.ChevronRight size={18} />
-                        </span>
-                    </button>
-                    <a 
-                        href={SOCIAL_LINKS.discord} target="_blank" rel="noreferrer"
-                        className="px-8 py-3 md:px-10 md:py-4 bg-slate-800/50 border border-indigo-500/50 text-indigo-100 font-bold rounded-2xl hover:bg-indigo-900/50 hover:border-indigo-400 transition-all flex items-center justify-center gap-2 backdrop-blur-sm w-full md:w-auto"
-                    >
-                        DISCORD
-                    </a>
-                </div>
-            </motion.div>
+        const CssStarBackground = () => (
+            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-50 bg-black">
+                <style>{`
+                    @keyframes animStar { from { transform: translateY(0px); } to { transform: translateY(-2000px); } }
+                    @keyframes twinkle { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+                `}</style>
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-black/80"></div>
+                <div style={{ width: 1, height: 1, boxShadow: '100px 200px #FFF, 400px 300px #FFF, 800px 100px #FFF', animation: 'animStar 100s linear infinite' }} className="absolute bg-transparent rounded-full"></div>
+            </div>
         );
 
-        const ServerStats = () => {
-            const [online, setOnline] = useState(0);
-            
-            useEffect(() => {
-                const target = 4532;
-                const duration = 2000;
-                const step = target / (duration / 16);
-                let current = 0;
-                const timer = setInterval(() => {
-                    current += step;
-                    if (current >= target) {
-                        setOnline(target);
-                        clearInterval(timer);
-                    } else {
-                        setOnline(Math.floor(current));
-                    }
-                }, 16);
-                return () => clearInterval(timer);
-            }, []);
-
-            return (
-                <motion.div 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className="min-h-screen pt-28 px-4 flex flex-col items-center"
-                >
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-10 flex items-center gap-3">
-                        <Icons.Server className="text-blue-500" /> МОНИТОРИНГ
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-                        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-6 md:p-8 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/50 transition-colors shadow-2xl">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all" />
-                            <h3 className="text-slate-400 text-base uppercase tracking-wider mb-2">Онлайн DragonWorld</h3>
-                            <div className="text-5xl md:text-6xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                                {online.toLocaleString()}
-                            </div>
-                            <div className="w-full h-3 bg-slate-800 mt-6 rounded-full overflow-hidden border border-slate-700/50">
-                                <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: '85%' }}
-                                    transition={{ duration: 2, delay: 0.5 }}
-                                    className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 relative"
-                                >
-                                    <div className="absolute inset-0 bg-white/30 animate-[pulse_2s_infinite]" />
-                                </motion.div>
-                            </div>
-                            <p className="text-xs md:text-sm text-slate-500 mt-2 text-right">Слотов: 5,000</p>
-                        </div>
-
-                        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-6 md:p-8 rounded-[2rem] hover:border-green-500/50 transition-colors shadow-2xl">
-                            <h3 className="text-slate-400 text-base uppercase tracking-wider mb-2">Статус работы</h3>
-                            <div className="text-5xl md:text-6xl font-mono font-bold text-green-400 flex items-center gap-4">
-                                ONLINE <div className="p-2 bg-green-500/20 rounded-full"><Icons.Check size={28} /></div>
-                            </div>
-                            <p className="text-slate-300 mt-4 text-sm md:text-base">Сервер работает стабильно. Приятной игры!</p>
-                        </div>
-                    </div>
-                </motion.div>
-            );
-        };
+        const Navbar = ({ activeTab, setActiveTab }) => (
+            <nav className="fixed top-0 left-0 right-0 z-40 flex justify-center py-4 pointer-events-none">
+                <div className="flex bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-full px-2 py-2 shadow-xl pointer-events-auto">
+                    {[{ id: 'home', icon: Icons.Home, label: 'Главная' }, { id: 'shop', icon: Icons.ShoppingCart, label: 'Магазин' }, { id: 'gallery', icon: Icons.Image, label: 'Медиа' }].map((tab) => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`relative flex items-center gap-2 px-4 py-2 rounded-full transition-all ${activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-blue-200'}`}>
+                            {activeTab === tab.id && <motion.div layoutId="active-pill" className="absolute inset-0 bg-blue-600 rounded-full" />}
+                            <span className="relative z-10 flex items-center gap-2 text-sm md:text-base"><tab.icon size={16} /> {tab.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </nav>
+        );
 
         const PurchaseModal = ({ item, onClose }) => {
             const [nick, setNick] = useState('');
-            const [promo, setPromo] = useState('');
-            const [discount, setDiscount] = useState(0);
-            const [finalPrice, setFinalPrice] = useState(item.price);
-            const isCase = item.type === 'case';
             const [count, setCount] = useState(1);
+            const [step, setStep] = useState(1); // 1 = Ввод данных, 2 = Выбор оплаты
 
-            const handleCountChange = (e) => {
-                let val = parseInt(e.target.value) || 1;
-                if (val < 1) val = 1;
-                if (val > 10) val = 10;
-                setCount(val);
-            };
+            const finalPrice = item.price * count; // Здесь можно добавить логику промокодов
 
-            useEffect(() => {
-                const basePrice = isCase ? item.price * count : item.price;
-                if (PROMO_CODES[promo]) {
-                    const discPercent = PROMO_CODES[promo];
-                    setDiscount(discPercent);
-                    setFinalPrice(Math.round(basePrice * (1 - discPercent)));
+            const handlePayment = (method) => {
+                if (method === 'crypto') {
+                    // Перенаправление на CryptoCloud POS
+                    window.location.href = LINKS.CRYPTO;
                 } else {
-                    setDiscount(0);
-                    setFinalPrice(basePrice);
+                    // Перенаправление на фиатную оплату
+                    window.location.href = LINKS.FIAT;
                 }
-            }, [promo, item.price, count, isCase]);
+            };
 
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4 overflow-y-auto py-10">
                     <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose} />
-                    <motion.div 
-                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="relative bg-slate-900 border border-slate-700 w-full max-w-sm md:max-w-md p-6 md:p-8 rounded-[2rem] shadow-[0_0_50px_rgba(0,100,255,0.2)] overflow-hidden my-auto"
-                    >
-                        <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${item.color}`} />
+                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-slate-900 border border-slate-700 w-full max-w-sm md:max-w-md p-6 rounded-[2rem] shadow-2xl overflow-hidden my-auto">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-500 hover:text-white"><Icons.X size={20} /></button>
                         
-                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
-                            <Icons.X size={20} />
-                        </button>
-
                         <div className="flex items-center gap-4 mb-6">
-                            <div className={`p-3 md:p-4 rounded-2xl bg-gradient-to-br ${item.color} shadow-lg`}>
-                                <item.icon className="text-white" size={24} />
-                            </div>
+                            <div className={`p-3 rounded-2xl bg-gradient-to-br ${item.color} shadow-lg`}><item.icon className="text-white" size={24} /></div>
                             <div>
-                                <h3 className="text-xl md:text-2xl font-bold text-white leading-none">{item.name}</h3>
-                                <p className="text-slate-400 text-[10px] md:text-xs mt-1 uppercase tracking-wide opacity-80">
-                                    {isCase ? 'Покупка кейса' : item.type === 'misc' ? 'Услуга' : 'Покупка привилегии'}
-                                </p>
+                                <h3 className="text-xl font-bold text-white">{item.name}</h3>
+                                <p className="text-slate-400 text-xs">{finalPrice} ₽</p>
                             </div>
                         </div>
 
-                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                            <div>
-                                <label className="block text-slate-300 text-xs md:text-sm mb-2 font-medium ml-1">Никнейм Minecraft</label>
-                                <input 
-                                    type="text" 
-                                    value={nick}
-                                    onChange={(e) => setNick(e.target.value)}
-                                    placeholder="Введите ваш ник..."
-                                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-slate-800 transition-all placeholder:text-slate-600 text-sm"
-                                />
-                            </div>
-
-                            {isCase && (
-                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                                    <label className="block text-slate-300 text-xs md:text-sm mb-2 font-medium ml-1">Количество (Макс. 10)</label>
-                                    <div className="flex items-center gap-4">
-                                        <input 
-                                            type="number" 
-                                            value={count}
-                                            onChange={handleCountChange}
-                                            min={1}
-                                            max={10}
-                                            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-sm"
-                                        />
-                                        <span className="text-slate-400 text-xs whitespace-nowrap">шт.</span>
+                        {step === 1 ? (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-slate-300 text-sm mb-2 font-medium">Ваш Никнейм</label>
+                                    <input type="text" value={nick} onChange={(e) => setNick(e.target.value)} placeholder="Steve" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none" />
+                                </div>
+                                {item.type === 'case' && (
+                                    <div>
+                                        <label className="block text-slate-300 text-sm mb-2 font-medium">Количество</label>
+                                        <input type="number" value={count} onChange={(e) => setCount(Math.max(1, e.target.value))} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none" />
                                     </div>
-                                </motion.div>
-                            )}
-
-                            <div>
-                                <div className="flex justify-between ml-1 mb-2">
-                                    <label className="block text-slate-300 text-xs md:text-sm font-medium">Промокод</label>
-                                    {discount > 0 && (
-                                        <span className="text-green-400 text-xs font-bold flex items-center gap-1 animate-pulse">
-                                            <Icons.Check size={12} /> Скидка {discount * 100}%
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <input 
-                                        type="text" 
-                                        value={promo}
-                                        onChange={(e) => setPromo(e.target.value)}
-                                        placeholder="Есть промокод?"
-                                        className={`w-full bg-slate-800/50 border rounded-xl px-4 py-3 text-white focus:outline-none transition-colors placeholder:text-slate-600 text-sm ${discount > 0 ? 'border-green-500/50 text-green-300' : 'border-slate-700/50 focus:border-blue-500'}`}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t border-slate-800/50 mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                <div className="flex flex-col items-center sm:items-start">
-                                    <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">К оплате:</span>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">{finalPrice} ₽</span>
-                                        {discount > 0 && (
-                                            <span className="text-slate-500 line-through text-xs">
-                                                {isCase ? item.price * count : item.price} ₽
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <button className="w-full sm:w-auto relative group bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/20 overflow-hidden">
-                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                    <span className="relative">КУПИТЬ</span>
+                                )}
+                                <button onClick={() => nick ? setStep(2) : alert('Введите ник!')} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-500/20 mt-4">
+                                    ДАЛЕЕ
                                 </button>
                             </div>
-                        </form>
+                        ) : (
+                            <div className="space-y-3">
+                                <h4 className="text-center text-white font-medium mb-4">Выберите способ оплаты</h4>
+                                
+                                <button onClick={() => handlePayment('crypto')} className="w-full group relative flex items-center justify-between p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-orange-500/50 rounded-xl transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-orange-500/20 rounded-lg text-orange-400"><Icons.Bitcoin size={24} /></div>
+                                        <div className="text-left">
+                                            <div className="text-white font-bold text-sm">Криптовалюта</div>
+                                            <div className="text-slate-400 text-xs">USDT, BTC, ETH, LTC</div>
+                                        </div>
+                                    </div>
+                                    <Icons.ChevronRight className="text-slate-600 group-hover:text-white" />
+                                </button>
+
+                                <button onClick={() => handlePayment('fiat')} className="w-full group relative flex items-center justify-between p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded-xl transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Icons.CreditCard size={24} /></div>
+                                        <div className="text-left">
+                                            <div className="text-white font-bold text-sm">Банковская карта</div>
+                                            <div className="text-slate-400 text-xs">EUR, USD (Mastercard/Visa)</div>
+                                        </div>
+                                    </div>
+                                    <Icons.ChevronRight className="text-slate-600 group-hover:text-white" />
+                                </button>
+
+                                <button onClick={() => setStep(1)} className="w-full text-slate-500 text-sm mt-2 hover:text-white">Назад</button>
+                            </div>
+                        )}
                     </motion.div>
                 </div>
             );
         };
 
         const Shop = () => {
-            const [shopTab, setShopTab] = useState('ranks');
             const [selectedItem, setSelectedItem] = useState(null);
-
-            const getDisplayedProducts = () => {
-                switch(shopTab) {
-                    case 'ranks': return RANK_PRODUCTS;
-                    case 'cases': return CASE_PRODUCTS;
-                    case 'misc': return MISC_PRODUCTS;
-                    default: return RANK_PRODUCTS;
-                }
-            };
-
-            const displayedProducts = getDisplayedProducts();
-
-            const ShopTabButton = ({ id, label, colorClass, activeClass }) => (
-                <button 
-                    onClick={() => setShopTab(id)}
-                    className={`relative px-4 md:px-8 py-2 md:py-3 rounded-xl font-bold transition-all duration-300 overflow-hidden group flex-1 md:flex-none text-xs md:text-sm ${
-                        shopTab === id 
-                        ? `${activeClass} text-white shadow-lg scale-105` 
-                        : 'text-slate-400 hover:text-white bg-slate-800/30'
-                    }`}
-                >
-                    <span className="relative z-10">{label}</span>
-                    {shopTab === id && (
-                        <motion.div 
-                            layoutId="shop-tab-bg"
-                            className={`absolute inset-0 ${colorClass}`}
-                            transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                        />
-                    )}
-                </button>
-            );
-
             return (
-                <motion.div 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className="min-h-screen pt-28 px-4 pb-20 max-w-7xl mx-auto"
-                >
-                    <div className="text-center mb-8 md:mb-12">
-                        <h2 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase drop-shadow-lg tracking-tight">
-                            Магазин <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 animate-pulse">DragonWorld</span>
-                        </h2>
-                        <p className="text-slate-400 mb-6 md:mb-8 font-light text-sm md:text-base">Выберите категорию:</p>
-                        
-                        <div className="flex flex-wrap justify-center bg-slate-900/60 backdrop-blur-md p-2 rounded-2xl border border-slate-700/50 gap-2 w-full md:w-auto">
-                            <ShopTabButton 
-                                id="ranks" 
-                                label="ПРИВИЛЕГИИ" 
-                                colorClass="bg-gradient-to-r from-blue-600 to-indigo-600"
-                                activeClass="shadow-blue-500/20"
-                            />
-                            <ShopTabButton 
-                                id="cases" 
-                                label="КЕЙСЫ" 
-                                colorClass="bg-gradient-to-r from-purple-600 to-fuchsia-600"
-                                activeClass="shadow-purple-500/20"
-                            />
-                            <ShopTabButton 
-                                id="misc" 
-                                label="РАЗНОЕ" 
-                                colorClass="bg-gradient-to-r from-emerald-500 to-teal-500"
-                                activeClass="shadow-emerald-500/20"
-                            />
-                        </div>
-                    </div>
-                    
-                    <motion.div 
-                        key={shopTab}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
-                    >
-                        {displayedProducts.map((item) => (
-                            <motion.div 
-                                key={item.id}
-                                whileHover={{ y: -8, scale: 1.02 }}
-                                className="group relative bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-[1.5rem] p-5 md:p-6 overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300"
-                                onClick={() => setSelectedItem(item)}
-                            >
-                                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                                
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                        <item.icon className="text-white drop-shadow-md" size={24} />
-                                    </div>
-                                    <div className="bg-slate-800/80 backdrop-blur-sm px-3 py-1.5 rounded-xl text-white font-mono font-bold border border-slate-700/50 group-hover:border-slate-500 transition-colors text-sm">
-                                        {item.price} ₽
-                                    </div>
-                                </div>
-
-                                <h3 className="text-lg md:text-xl font-bold text-white mb-2 uppercase tracking-wide group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">
-                                    {item.name}
-                                </h3>
-                                <p className="text-slate-400 text-xs md:text-sm mb-6 h-8 md:h-10 leading-relaxed opacity-80 overflow-hidden">{item.desc}</p>
-                                
-                                <button className="w-full py-3 rounded-xl bg-slate-800 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 transition-all flex items-center justify-center gap-2 font-bold text-white text-xs md:text-sm tracking-wider shadow-lg">
-                                    <span>КУПИТЬ</span> 
-                                    <Icons.ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </motion.div>
+                <div className="pt-28 px-4 pb-20 max-w-7xl mx-auto text-center">
+                    <h2 className="text-4xl font-black text-white mb-8">МАГАЗИН</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {RANK_PRODUCTS.concat(CASE_PRODUCTS).map((item) => (
+                            <div key={item.id} onClick={() => setSelectedItem(item)} className="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-6 cursor-pointer hover:scale-105 transition-transform">
+                                <item.icon className={`text-transparent bg-clip-text bg-gradient-to-br ${item.color} mx-auto mb-2`} size={40} />
+                                <h3 className="text-white font-bold">{item.name}</h3>
+                                <p className="text-blue-400 font-mono mt-1">{item.price} ₽</p>
+                            </div>
                         ))}
-                    </motion.div>
-
+                    </div>
                     <AnimatePresence>
-                        {selectedItem && (
-                            <PurchaseModal item={selectedItem} onClose={() => setSelectedItem(null)} />
-                        )}
+                        {selectedItem && <PurchaseModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
                     </AnimatePresence>
-                </motion.div>
+                </div>
             );
         };
 
-        const Gallery = () => (
-            <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="min-h-screen pt-28 px-4 flex flex-col items-center"
-            >
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">ГАЛЕРЕЯ МИРОВ</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="aspect-video bg-slate-800/50 rounded-3xl overflow-hidden border border-slate-700/50 relative group cursor-pointer">
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                                <Icons.Image size={48} className="text-slate-700 group-hover:text-blue-400 transition-colors duration-500" />
-                            </div>
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                <span className="text-white font-bold border border-white/30 px-6 py-3 rounded-2xl backdrop-blur-md bg-white/10 hover:bg-white/20 transition-all transform translate-y-4 group-hover:translate-y-0 duration-300 text-sm md:text-base">
-                                    Скриншот DragonWorld #{i}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </motion.div>
-        );
-
-        const Footer = () => (
-            <footer className="w-full py-8 md:py-12 bg-black/80 backdrop-blur-xl border-t border-slate-800 text-center relative z-20 mt-auto">
-                <div className="flex justify-center gap-6 mb-6">
-                    <a href={SOCIAL_LINKS.telegram} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-blue-400 transition transform hover:-translate-y-1">Telegram</a>
-                    <a href={SOCIAL_LINKS.discord} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-indigo-400 transition transform hover:-translate-y-1">Discord</a>
-                </div>
-                <div className="text-slate-600 text-xs md:text-sm px-4">
-                    &copy; 2025 DragonWorld. Все права защищены.<br/>
-                    Мы не связаны с Mojang AB.
-                </div>
-            </footer>
-        );
-
         function App() {
-            const [activeTab, setActiveTab] = useState('home');
-
+            const [activeTab, setActiveTab] = useState('shop');
             return (
-                <div className="relative">
+                <div className="relative min-h-screen">
                     <CssStarBackground />
                     <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-                    <div className="relative z-10 pb-10">
-                        <AnimatePresence mode="wait">
-                            {activeTab === 'home' && <HeroSection key="home" setActiveTab={setActiveTab} />}
-                            {activeTab === 'server' && <ServerStats key="server" />}
-                            {activeTab === 'shop' && <Shop key="shop" />}
-                            {activeTab === 'gallery' && <Gallery key="gallery" />}
-                        </AnimatePresence>
-                    </div>
-                    {activeTab !== 'home' && <Footer />}
+                    {activeTab === 'shop' && <Shop />}
                 </div>
             );
         }
@@ -624,6 +246,4 @@
     </script>
 </body>
 </html>
-
-
 
