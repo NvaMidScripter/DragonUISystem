@@ -116,36 +116,36 @@
 
         // Обновленный список товаров
         const RANK_PRODUCTS = [
-            { id: 'tiger', name: 'TIGER', price: 239, type: 'rank', icon: Icons.Zap, color: 'from-orange-400 to-amber-500', desc: 'Улучшенные киты, x3 валюты.' },
+            { id: 'tiger', name: 'TIGER', price: 239, type: 'rank', icon: Icons.Zap, color: 'from-orange-400 to-amber-500', desc: '' },
             { id: 'bunny', name: 'BUNNY', price: 369, type: 'rank', icon: Icons.Star, color: 'from-cyan-400 to-blue-400', desc: 'Доступ к региону, x3.5 монет.' },
-            { id: 'hydra', name: 'HYDRA', price: 489, type: 'rank', icon: Icons.Crown, color: 'from-teal-400 to-emerald-500', desc: 'Возможность бана, x4 валюты.' },
-            { id: 'rabbit', name: 'RABBIT', price: 579, type: 'rank', icon: Icons.Star, color: 'from-indigo-400 to-purple-500', desc: 'Уникальный кит, 999 слотов аукциона.' },
-            { id: 'dhelper', name: 'D.HELPER', price: 666, type: 'rank', icon: Icons.Shield, color: 'from-yellow-400 to-yellow-600', desc: 'Золотой префикс, уникальные права.' },
-            { id: 'ghost', name: 'GHOST', price: 899, type: 'rank', icon: Icons.Ghost, color: 'from-slate-400 to-slate-600', desc: 'Невидимость, троллинг функции.' },
-            { id: 'cobra', name: 'COBRA', price: 999, type: 'rank', icon: Icons.Zap, color: 'from-lime-400 to-green-600', desc: 'Топовый донат, доступ почти ко всему.' },
+            { id: 'hydra', name: 'HYDRA', price: 489, type: 'rank', icon: Icons.Crown, color: 'from-teal-400 to-emerald-500', desc: '' },
+            { id: 'rabbit', name: 'RABBIT', price: 579, type: 'rank', icon: Icons.Star, color: 'from-indigo-400 to-purple-500', desc: '' },
+            { id: 'dhelper', name: 'D.HELPER', price: 666, type: 'rank', icon: Icons.Shield, color: 'from-yellow-400 to-yellow-600', desc: '' },
+            { id: 'ghost', name: 'GHOST', price: 899, type: 'rank', icon: Icons.Ghost, color: 'from-slate-400 to-slate-600', desc: '' },
+            { id: 'cobra', name: 'COBRA', price: 999, type: 'rank', icon: Icons.Zap, color: 'from-lime-400 to-green-600', desc: '' },
             
             // Новые ранги
-            { id: 'god', name: 'GOD', price: 1215, type: 'rank', icon: Icons.Sun, color: 'from-amber-200 to-yellow-500', desc: 'Божественные силы, полный креатив.' },
-            { id: 'vampire', name: 'VAMPIRE', price: 1444, type: 'rank', icon: Icons.Droplet, color: 'from-red-900 to-red-600', desc: 'Вампиризм, полет без ограничений.' },
-            { id: 'mladmin', name: 'ML.ADMIN', price: 1650, type: 'rank', icon: Icons.ShieldAlert, color: 'from-pink-500 to-rose-600', desc: 'Младший админ. Слежка и проверки.' },
+            { id: 'god', name: 'GOD', price: 1215, type: 'rank', icon: Icons.Sun, color: 'from-amber-200 to-yellow-500', desc: '' },
+            { id: 'vampire', name: 'VAMPIRE', price: 1444, type: 'rank', icon: Icons.Droplet, color: 'from-red-900 to-red-600', desc: '' },
+            { id: 'mladmin', name: 'ML.ADMIN', price: 1650, type: 'rank', icon: Icons.ShieldAlert, color: 'from-pink-500 to-rose-600', desc: '' },
             
-            { id: 'dadmin', name: 'D.ADMIN', price: 3650, type: 'rank', icon: Icons.Crown, color: 'from-red-500 to-red-700', desc: 'ВЛАДЕЛЕЦ. Максимальные права.' },
+            { id: 'dadmin', name: 'D.ADMIN', price: 3650, type: 'rank', icon: Icons.Crown, color: 'from-red-500 to-red-700', desc: '' },
         ];
 
         const CASE_PRODUCTS = [
-            { id: 'c_super_new', name: 'Супер кейс', price: 349, type: 'case', icon: Icons.Gift, color: 'from-fuchsia-600 to-pink-500', desc: 'Новинка! Эксклюзивные награды' },
-            { id: 'c_purple', name: 'Кейс с супер донатом', price: 250, type: 'case', icon: Icons.Zap, color: 'from-purple-600 to-purple-400', desc: 'Шанс на высшие привилегии' },
-            { id: 'c_red', name: 'Хэллоуинский кейс', price: 129, type: 'case', icon: Icons.Ghost, color: 'from-red-600 to-rose-500', desc: 'Лимитированные ужасы' },
-            { id: 'c_darkred', name: 'Кейс с донатом', price: 99, type: 'case', icon: Icons.Flame, color: 'from-red-800 to-red-600', desc: 'Высокий шанс на донат' },
-            { id: 'c_green', name: 'Кейс с китами', price: 89, type: 'case', icon: Icons.Box, color: 'from-green-500 to-emerald-400', desc: 'Наборы ресурсов' },
-            { id: 'c_gold', name: 'Кейс с донат вещами', price: 59, type: 'case', icon: Icons.Package, color: 'from-yellow-500 to-amber-600', desc: 'Редкие предметы и броня' },
-            { id: 'c_blue', name: 'Кейс с риликами', price: 59, type: 'case', icon: Icons.Star, color: 'from-blue-600 to-indigo-500', desc: 'Древние артефакты' },
-            { id: 'c_yellow', name: 'Кейс с валютой', price: 49, type: 'case', icon: Icons.Crown, color: 'from-yellow-300 to-yellow-500', desc: 'Монеты и токены' },
-            { id: 'c_cyan', name: 'Кейс с префиксами', price: 30, type: 'case', icon: Icons.MessageCircle, color: 'from-cyan-500 to-blue-400', desc: 'Уникальные цвета чата' },
+            { id: 'c_super_new', name: 'Супер кейс', price: 349, type: 'case', icon: Icons.Gift, color: 'from-fuchsia-600 to-pink-500', desc: '' },
+            { id: 'c_purple', name: 'Кейс с супер донатом', price: 250, type: 'case', icon: Icons.Zap, color: 'from-purple-600 to-purple-400', desc: '' },
+            { id: 'c_red', name: 'Хэллоуинский кейс', price: 129, type: 'case', icon: Icons.Ghost, color: 'from-red-600 to-rose-500', desc: '' },
+            { id: 'c_darkred', name: 'Кейс с донатом', price: 99, type: 'case', icon: Icons.Flame, color: 'from-red-800 to-red-600', desc: '' },
+            { id: 'c_green', name: 'Кейс с китами', price: 89, type: 'case', icon: Icons.Box, color: 'from-green-500 to-emerald-400', desc: '' },
+            { id: 'c_gold', name: 'Кейс с донат вещами', price: 59, type: 'case', icon: Icons.Package, color: 'from-yellow-500 to-amber-600', desc: '' },
+            { id: 'c_blue', name: 'Кейс с риликами', price: 59, type: 'case', icon: Icons.Star, color: 'from-blue-600 to-indigo-500', desc: '' },
+            { id: 'c_yellow', name: 'Кейс с валютой', price: 49, type: 'case', icon: Icons.Crown, color: 'from-yellow-300 to-yellow-500', desc: '' },
+            { id: 'c_cyan', name: 'Кейс с префиксами', price: 30, type: 'case', icon: Icons.MessageCircle, color: 'from-cyan-500 to-blue-400', desc: '' },
         ];
 
         const MISC_PRODUCTS = [
-            { id: 'unban', name: 'РАЗБАН', price: 349, type: 'misc', icon: Icons.Unlock, color: 'from-emerald-400 to-green-600', desc: 'Снимает блокировку аккаунта навсегда.' },
+            { id: 'unban', name: 'РАЗБАН', price: 349, type: 'misc', icon: Icons.Unlock, color: 'from-emerald-400 to-green-600', desc: 'Снимает блокировку аккаунта.' },
             { id: 'unmute', name: 'РАЗМУТ', price: 149, type: 'misc', icon: Icons.Mic, color: 'from-sky-400 to-blue-600', desc: 'Возвращает возможность писать в чат.' },
         ];
 
@@ -303,10 +303,10 @@
                             <div className="text-5xl md:text-6xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                                 {online.toLocaleString()}
                             </div>
-                            <div className="w-full h-3 bg-slate-800 mt-6 rounded-full overflow-hidden border border-slate-700/50">
+                            <div className="w-full h-3 bg-slate-0 mt-6 rounded-full overflow-hidden border border-slate-0/0">
                                 <motion.div 
                                     initial={{ width: 0 }}
-                                    animate={{ width: '85%' }}
+                                    animate={{ width: '0%' }}
                                     transition={{ duration: 2, delay: 0.5 }}
                                     className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 relative"
                                 >
